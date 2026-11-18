@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instant Flight Status Notification System - Batik Air & OTAs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Prompt', sans-serif;
+            background-color: #f1f5f9;
+        }
+        @keyframes slideDown {
+            0% { transform: translateY(-100%); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        .animate-push {
+            animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .phone-screen::-webkit-scrollbar {
+            width: 4px;
+        }
+        .phone-screen::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-slate-900 text-white py-4 px-6 shadow-md">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-red-600 flex items-center justify-center font-bold text-xl shadow">
+                    ✈️
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold tracking-wide">Instant Flight Status Notification System</h1>
+                    <p class="text-xs text-slate-400">Event-Driven Real-time Alert Prototype (Batik Air & OTA Integration)</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 text-xs bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>API Gateway: Connected</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+        <!-- Left Column: Airline Operations Dashboard (7 cols) -->
+        <div class="lg:col-span-7 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="bg-slate-50 border-b border-slate-200 px-6 py-4 flex justify-between items-center">
+                <div>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-red-600">Airline Operations Center</span>
+                    <h2 class="text-lg font-bold text-slate-800">ศูนย์ควบคุมและแจ้งเตือนสถานะเที่ยวบิน</h2>
+                </div>
+                <span class="text-xs bg-blue-50 text-blue-700 font-medium px-2.5 py-1 rounded-md border border-blue-200">
+                    Admin Console
+                </span>
+            </div>
+
+            <div class="p-6 space-y-6">
+                <!-- Flight Info Card -->
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                    <div class="flex flex-wrap justify-between items-center gap-2 mb-3 pb-3 border-b border-slate-200">
+                        <div>
+                            <span class="text-xs text-slate-500">เที่ยวบิน (Flight Number)</span>
+                            <div class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                                <span>OD 523 (Batik Air)</span>
+                                <span id="statusBadge" class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-medium">
+                                    ON TIME (ปกติ)
+                                </span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs text-slate-500">เส้นทาง (Route)</span>
+                            <div class="font-semibold text-slate-800">DMK (ดอนเมือง) ➔ KUL (กัวลาลัมเปอร์)</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+                        <div>
+                            <span class="text-xs text-slate-500 block">กำหนดการเดิม</span>
+                            <span class="font-semibold text-slate-800">12:05 น.</span>
+                        </div>
+                        <div>
+                            <span class="text-xs text-slate-500 block">เวลาใหม่</span>
+                            <span id="newTimeDisplay" class="font-semibold text-slate-800">15:30 น.</span>
+                        </div>
+                        <div>
+                            <span class="text-xs text-slate-500 block">ประตูขึ้นเครื่อง (Gate)</span>
+                            <span id="gateDisplay" class="font-semibold text-slate-800">Gate 24</span>
+                        </div>
+                        <div>
+                            <span class="text-xs text-slate-500 block">ผู้โดยสารในระบบ</span>
+                            <span class="font-semibold text-slate-800">168 คน (OTA 65%)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Passenger Target Info (OTA Case Study) -->
+                <div class="bg-amber-50/70 rounded-xl p-4 border border-amber-200">
+                    <h3 class="text-xs font-bold uppercase text-amber-800 mb-2 flex items-center gap-1.5">
+                        <span>🔗 ข้อมูลผู้โดยสารที่เชื่อมผ่าน API (PNR Matching)</span>
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-slate-700">
+                        <div class="bg-white p-2.5 rounded-lg border border-amber-100">
+                            <span class="text-slate-400 block">ชื่อผู้โดยสาร</span>
+                            <span class="font-semibold">คุณณัฐธิดา จันทร์สุขเนตร</span>
+                        </div>
+                        <div class="bg-white p-2.5 rounded-lg border border-amber-100">
+                            <span class="text-slate-400 block">รหัสการจอง (PNR)</span>
+                            <span class="font-mono font-bold text-red-600">BTK89X</span>
+                        </div>
+                        <div class="bg-white p-2.5 rounded-lg border border-amber-100">
+                            <span class="text-slate-400 block">ช่องทางการจอง</span>
+                            <span class="font-semibold text-blue-600">Agoda / Traveloka (OTA)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Simulation Controls -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-3">
+                        จำลองเหตุการณ์เปลี่ยนแปลงเที่ยวบิน (กดปุ่มเพื่อส่งสัญญาณทันที):
+                    </label>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <button onclick="triggerAlert('DELAY')" class="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-amber-400 bg-amber-50 hover:bg-amber-100 text-amber-900 transition cursor-pointer shadow-sm active:scale-95">
+                            <span class="text-2xl mb-1">⏳</span>
+                            <span class="font-bold text-sm">แจ้งเลื่อนเวลา (Delay)</span>
+                            <span class="text-[11px] text-amber-700 mt-0.5">เลื่อนเป็น 14:15 น.</span>
+                        </button>
+
+                        <button onclick="triggerAlert('CANCEL')" class="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-red-500 bg-red-50 hover:bg-red-100 text-red-900 transition cursor-pointer shadow-sm active:scale-95">
+                            <span class="text-2xl mb-1">🚫</span>
+                            <span class="font-bold text-sm">ยกเลิกเที่ยวบิน (Cancel)</span>
+                            <span class="text-[11px] text-red-700 mt-0.5">เสนอเปลี่ยนรอบ / คืนเงิน</span>
+                        </button>
+
+                        <button onclick="triggerAlert('GATE')" class="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-blue-500 bg-blue-50 hover:bg-blue-100 text-blue-900 transition cursor-pointer shadow-sm active:scale-95">
+                            <span class="text-2xl mb-1">🚪</span>
+                            <span class="font-bold text-sm">เปลี่ยนเกต (Gate Change)</span>
+                            <span class="text-[11px] text-blue-700 mt-0.5">ย้ายไป Gate 32</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- System Logs -->
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-semibold text-slate-500">System Event Logs (การประมวลผลหลังบ้าน)</span>
+                        <button onclick="resetDemo()" class="text-xs text-slate-400 hover:text-slate-600 underline">รีเซ็ตระบบ</button>
+                    </div>
+                    <div id="systemLogs" class="bg-slate-900 text-emerald-400 font-mono text-xs p-3.5 rounded-xl h-32 overflow-y-auto space-y-1.5">
+                        <div>[SYSTEM] Ready. Listening to Batik Air Flight Status API...</div>
+                        <div>[SYNC] PNR BTK89X synced from OTA Gateway (LINE ID Linked).</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Passenger Mobile View (5 cols) -->
+        <div class="lg:col-span-5 flex flex-col items-center">
+            <div class="text-center mb-3">
+                <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Passenger Experience</span>
+                <h3 class="text-base font-bold text-slate-800">หน้าจอมือถือผู้โดยสาร (รับข้อความทันที)</h3>
+            </div>
+
+            <!-- Smartphone Mockup -->
+            <div class="w-[340px] sm:w-[360px] h-[660px] bg-slate-900 rounded-[44px] p-3 shadow-2xl border-4 border-slate-800 relative flex flex-col">
+                <!-- Notch -->
+                <div class="w-32 h-5 bg-slate-900 rounded-b-2xl mx-auto absolute top-3 left-1/2 -translate-x-1/2 z-30"></div>
+
+                <!-- Phone Screen -->
+                <div class="bg-[#8cabd9] flex-1 rounded-[34px] overflow-hidden flex flex-col relative">
+                    
+                    <!-- Status Bar -->
+                    <div class="bg-slate-900/20 text-white text-[11px] px-5 pt-2 pb-1 flex justify-between items-center z-20">
+                        <span class="font-semibold">09:41</span>
+                        <div class="flex items-center gap-1.5">
+                            <span>5G</span>
+                            <span>🔋 100%</span>
+                        </div>
+                    </div>
+
+                    <!-- Top Banner Push Notification (Hidden by default) -->
+                    <div id="pushBanner" class="hidden absolute top-8 left-2.5 right-2.5 bg-white/95 backdrop-blur-md rounded-2xl p-3 shadow-xl border border-slate-200 z-40">
+                        <div class="flex items-start gap-2.5">
+                            <div class="w-9 h-9 rounded-xl bg-red-600 text-white flex items-center justify-center font-bold text-sm shrink-0">
+                                ✈️
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs font-bold text-slate-900">Batik Air Alert • LINE</span>
+                                    <span class="text-[10px] text-slate-400">เมื่อสักครู่</span>
+                                </div>
+                                <p id="pushBannerText" class="text-xs text-slate-700 mt-0.5 line-clamp-2">
+                                    แจ้งเตือนสถานะเที่ยวบิน OD 521 มีการเปลี่ยนแปลง
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LINE App Header -->
+                    <div class="bg-[#242c3b] text-white px-4 py-3 flex items-center justify-between shadow-sm z-10">
+                        <div class="flex items-center gap-2.5">
+                            <span class="text-lg">‹</span>
+                            <div class="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-xs font-bold border border-white/20">
+                                OD
+                            </div>
+                            <div>
+                                <div class="text-sm font-semibold flex items-center gap-1">
+                                    <span>Batik Air Official</span>
+                                    <span class="text-[10px] bg-emerald-500 text-white px-1 rounded">✓</span>
+                                </div>
+                                <span class="text-[10px] text-slate-300 block">บัญชีทางการ • แจ้งเตือนอัตโนมัติ</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat Area -->
+                    <div id="chatContainer" class="phone-screen flex-1 p-3.5 overflow-y-auto space-y-3 flex flex-col">
+                        <!-- Initial Welcome Message -->
+                        <div class="text-center my-1">
+                            <span class="text-[10px] bg-black/20 text-white px-2.5 py-0.5 rounded-full">วันนี้</span>
+                        </div>
+
+                        <div class="flex items-start gap-2 max-w-[88%]">
+                            <div class="w-7 h-7 rounded-full bg-red-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-1">
+                                OD
+                            </div>
+                            <div class="bg-white rounded-2xl rounded-tl-none p-3 shadow-sm text-xs text-slate-700 space-y-1">
+                                <p class="font-semibold text-slate-900">ยืนยันการเชื่อมต่อข้อมูลการเดินทาง ✅</p>
+                                <p>สวัสดีคุณ <b>สมชาย ใจดี</b> ระบบได้ผูกข้อมูลการจองจากตัวแทนจำหน่าย (OTA) เรียบร้อยแล้ว</p>
+                                <div class="bg-slate-50 p-2 rounded-lg border border-slate-100 text-[11px] mt-1">
+                                    <div>เที่ยวบิน: <b>OD 521 (DMK - KUL)</b></div>
+                                    <div>รหัสการจอง (PNR): <b class="text-red-600">BTK89X</b></div>
+                                </div>
+                                <p class="text-[11px] text-slate-500 pt-1">หากเที่ยวบินมีการเปลี่ยนแปลง ระบบจะแจ้งเตือนคุณทันทีผ่านช่องทางนี้</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Input Bar Mockup -->
+                    <div class="bg-white px-3 py-2.5 border-t border-slate-200 flex items-center gap-2">
+                        <span class="text-slate-400 text-lg">+</span>
+                        <div class="flex-1 bg-slate-100 rounded-full px-3 py-1.5 text-xs text-slate-400">
+                            กดปุ่มด้านซ้ายเพื่อจำลองการแจ้งเตือน...
+                        </div>
+                        <span class="text-blue-500 font-bold text-sm">➤</span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        function addLog(message) {
+            const logs = document.getElementById('systemLogs');
+            const now = new Date().toLocaleTimeString('th-TH', { hour12: false });
+            const div = document.createElement('div');
+            div.textContent = `[${now}] ${message}`;
+            logs.appendChild(div);
+            logs.scrollTop = logs.scrollHeight;
+        }
+
+        function showPushBanner(text) {
+            const banner = document.getElementById('pushBanner');
+            const bannerText = document.getElementById('pushBannerText');
+            bannerText.textContent = text;
+            
+            banner.classList.remove('hidden', 'animate-push');
+            void banner.offsetWidth; // trigger reflow
+            banner.classList.add('animate-push');
+
+            setTimeout(() => {
+                banner.classList.add('hidden');
+            }, 4500);
+        }
+
+        function triggerAlert(type) {
+            const chat = document.getElementById('chatContainer');
+            const statusBadge = document.getElementById('statusBadge');
+            const newTimeDisplay = document.getElementById('newTimeDisplay');
+            const gateDisplay = document.getElementById('gateDisplay');
+
+            let cardHtml = '';
+            let pushMsg = '';
+
+            if (type === 'DELAY') {
+                statusBadge.className = 'text-xs px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold';
+                statusBadge.textContent = 'DELAYED (เลื่อนเวลา)';
+                newTimeDisplay.textContent = '14:15 น. (ใหม่)';
+                newTimeDisplay.className = 'font-bold text-amber-600';
+                gateDisplay.textContent = 'Gate 24';
+
+                pushMsg = '⚠️ ด่วน! เที่ยวบิน OD 521 เลื่อนเวลาออกเดินทางเป็น 14:15 น.';
+                addLog('EVENT: Flight OD 521 Delayed -> New ETD 14:15.');
+                addLog('DISPATCH: Sent Flex Message to PNR BTK89X (Latency: 1.2s).');
+
+                cardHtml = `
+                <div class="flex items-start gap-2 max-w-[92%] animate-push">
+                    <div class="w-7 h-7 rounded-full bg-red-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-1">OD</div>
+                    <div class="bg-white rounded-2xl rounded-tl-none overflow-hidden shadow-md border border-amber-200 flex-1">
+                        <div class="bg-amber-500 text-white px-3 py-2 text-xs font-bold flex items-center justify-between">
+                            <span>⚠️ แจ้งเลื่อนเวลาเที่ยวบิน (DELAY)</span>
+                            <span class="text-[10px] bg-black/20 px-1.5 py-0.5 rounded">ด่วน</span>
+                        </div>
+                        <div class="p-3 text-xs space-y-2">
+                            <p class="text-slate-700">เรียนคุณ <b>สมชาย ใจดี</b> เที่ยวบิน <b>OD 521</b> (DMK - KUL) มีการปรับเปลี่ยนเวลาออกเดินทาง:</p>
+                            <div class="bg-amber-50 p-2.5 rounded-xl border border-amber-200 space-y-1">
+                                <div class="flex justify-between">
+                                    <span class="text-slate-500">เวลาเดิม:</span>
+                                    <span class="line-through text-slate-400">10:30 น.</span>
+                                </div>
+                                <div class="flex justify-between font-bold text-amber-800 text-sm">
+                                    <span>เวลาออกเดินทางใหม่:</span>
+                                    <span>14:15 น.</span>
+                                </div>
+                                <div class="flex justify-between text-[11px] text-slate-600 pt-1 border-t border-amber-200/60">
+                                    <span>PNR: <b>BTK89X</b></span>
+                                    <span>Gate: <b>24</b></span>
+                                </div>
+                            </div>
+                            <div class="pt-1 space-y-1.5">
+                                <button onclick="userReply('ยืนยันเดินทางตามเวลาใหม่ (14:15 น.)')" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-xs transition cursor-pointer">
+                                    ✓ ยืนยันเดินทางเวลาใหม่
+                                </button>
+                                <button onclick="userReply('ขอเปลี่ยนรอบบินฟรี (Free Rebooking)')" class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg text-xs transition cursor-pointer">
+                                    🔄 เปลี่ยนเที่ยวบินฟรี
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            } 
+            else if (type === 'CANCEL') {
+                statusBadge.className = 'text-xs px-2.5 py-0.5 rounded-full bg-red-100 text-red-700 font-bold';
+                statusBadge.textContent = 'CANCELLED (ยกเลิก)';
+                newTimeDisplay.textContent = 'ยกเลิกเที่ยวบิน';
+                newTimeDisplay.className = 'font-bold text-red-600';
+
+                pushMsg = '🚨 แจ้งยกเลิกเที่ยวบิน OD 521 กรุณาเลือกเที่ยวบินใหม่หรือขอคืนเงิน';
+                addLog('EVENT: Flight OD 521 Cancelled due to operational reasons.');
+                addLog('DISPATCH: Sent Self-Service Recovery Card to PNR BTK89X (Latency: 1.4s).');
+
+                cardHtml = `
+                <div class="flex items-start gap-2 max-w-[92%] animate-push">
+                    <div class="w-7 h-7 rounded-full bg-red-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-1">OD</div>
+                    <div class="bg-white rounded-2xl rounded-tl-none overflow-hidden shadow-md border border-red-200 flex-1">
+                        <div class="bg-red-600 text-white px-3 py-2 text-xs font-bold flex items-center justify-between">
+                            <span>🚨 แจ้งยกเลิกเที่ยวบิน (CANCELLED)</span>
+                            <span class="text-[10px] bg-black/20 px-1.5 py-0.5 rounded">สำคัญมาก</span>
+                        </div>
+                        <div class="p-3 text-xs space-y-2">
+                            <p class="text-slate-700">ขออภัยคุณ <b>สมชาย ใจดี</b> เที่ยวบิน <b>OD 521</b> (10:30 น.) จำเป็นต้องยกเลิกการเดินทาง กรุณาเลือกรับสิทธิ์ทันทีโดยไม่ต้องติดต่อเคาน์เตอร์:</p>
+                            <div class="pt-1 space-y-1.5">
+                                <button onclick="userReply('เลือกเปลี่ยนเป็นเที่ยวบินถัดไป (OD 523 - 16:00 น.) ฟรี')" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg text-xs transition cursor-pointer">
+                                    ✈️ ย้ายไปไฟลต์ถัดไปฟรี (16:00 น.)
+                                </button>
+                                <button onclick="userReply('ยื่นขอคืนเงินเต็มจำนวน (Full Refund)')" class="w-full py-1.5 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-semibold rounded-lg text-xs transition cursor-pointer">
+                                    💳 ขอคืนเงินเต็มจำนวน (Refund)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            }
+            else if (type === 'GATE') {
+                statusBadge.className = 'text-xs px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700 font-bold';
+                statusBadge.textContent = 'GATE CHANGED';
+                gateDisplay.textContent = 'Gate 32 (ใหม่)';
+                gateDisplay.className = 'font-bold text-blue-600';
+
+                pushMsg = '🚪 แจ้งเปลี่ยนประตูขึ้นเครื่อง เที่ยวบิน OD 521 ย้ายไป Gate 32';
+                addLog('EVENT: Gate changed from 24 to 32.');
+                addLog('DISPATCH: Sent Instant Gate Alert to PNR BTK89X (Latency: 0.9s).');
+
+                cardHtml = `
+                <div class="flex items-start gap-2 max-w-[92%] animate-push">
+                    <div class="w-7 h-7 rounded-full bg-red-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-1">OD</div>
+                    <div class="bg-white rounded-2xl rounded-tl-none overflow-hidden shadow-md border border-blue-200 flex-1">
+                        <div class="bg-blue-600 text-white px-3 py-2 text-xs font-bold">
+                            <span>🚪 แจ้งเปลี่ยนประตูขึ้นเครื่อง (Gate Change)</span>
+                        </div>
+                        <div class="p-3 text-xs space-y-2">
+                            <p class="text-slate-700">เที่ยวบิน <b>OD 521</b> (ออกเดินทาง 10:30 น.) มีการเปลี่ยนประตูทางออกขึ้นเครื่อง:</p>
+                            <div class="bg-blue-50 p-2.5 rounded-xl border border-blue-200 flex justify-around items-center text-center">
+                                <div>
+                                    <span class="text-[10px] text-slate-400 block">เกตเดิม</span>
+                                    <span class="line-through text-slate-500 font-semibold">Gate 24</span>
+                                </div>
+                                <span class="text-blue-500 font-bold">➔</span>
+                                <div>
+                                    <span class="text-[10px] text-blue-600 block font-semibold">เกตใหม่</span>
+                                    <span class="text-base font-bold text-blue-800">Gate 32</span>
+                                </div>
+                            </div>
+                            <button onclick="userReply('รับทราบการเปลี่ยนไป Gate 32')" class="w-full py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg text-xs transition cursor-pointer">
+                                👍 รับทราบข้อมูล
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+            }
+
+            showPushBanner(pushMsg);
+            chat.insertAdjacentHTML('beforeend', cardHtml);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function userReply(actionText) {
+            const chat = document.getElementById('chatContainer');
+            
+            // User bubble
+            const userHtml = `
+            <div class="flex justify-end animate-push">
+                <div class="bg-[#85e249] text-slate-900 rounded-2xl rounded-tr-none px-3 py-2 shadow-sm text-xs max-w-[80%] font-medium">
+                    ${actionText}
+                </div>
+            </div>`;
+            chat.insertAdjacentHTML('beforeend', userHtml);
+            chat.scrollTop = chat.scrollHeight;
+
+            addLog(`USER ACTION: Passenger selected "${actionText}". Updating Airline PNR...`);
+
+            // Auto bot confirmation
+            setTimeout(() => {
+                const botReply = `
+                <div class="flex items-start gap-2 max-w-[85%] animate-push">
+                    <div class="w-7 h-7 rounded-full bg-red-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-1">OD</div>
+                    <div class="bg-white rounded-2xl rounded-tl-none p-2.5 shadow-sm text-xs text-slate-700">
+                        <span class="text-emerald-600 font-bold block mb-0.5">✅ บันทึกรายการสำเร็จ!</span>
+                        ระบบได้อัปเดตสถานะ <b>"${actionText}"</b> ลงในรหัสการจอง <b>BTK89X</b> เรียบร้อยแล้ว ท่านไม่จำเป็นต้องติดต่อเคาน์เตอร์สนามบิน
+                    </div>
+                </div>`;
+                chat.insertAdjacentHTML('beforeend', botReply);
+                chat.scrollTop = chat.scrollHeight;
+                addLog('SYNC COMPLETE: PNR BTK89X updated in Airline & OTA database.');
+            }, 600);
+        }
+
+        function resetDemo() {
+            const statusBadge = document.getElementById('statusBadge');
+            const newTimeDisplay = document.getElementById('newTimeDisplay');
+            const gateDisplay = document.getElementById('gateDisplay');
+
+            statusBadge.className = 'text-xs px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-medium';
+            statusBadge.textContent = 'ON TIME (ปกติ)';
+            newTimeDisplay.textContent = '10:30 น.';
+            newTimeDisplay.className = 'font-semibold text-slate-800';
+            gateDisplay.textContent = 'Gate 24';
+            gateDisplay.className = 'font-semibold text-slate-800';
+
+            const chat = document.getElementById('chatContainer');
+            chat.innerHTML = `
+                <div class="text-center my-1">
+                    <span class="text-[10px] bg-black/20 text-white px-2.5 py-0.5 rounded-full">วันนี้</span>
+                </div>
+                <div class="flex items-start gap-2 max-w-[88%]">
+                    <div class="w-7 h-7 rounded-full bg-red-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-1">OD</div>
+                    <div class="bg-white rounded-2xl rounded-tl-none p-3 shadow-sm text-xs text-slate-700 space-y-1">
+                        <p class="font-semibold text-slate-900">ยืนยันการเชื่อมต่อข้อมูลการเดินทาง ✅</p>
+                        <p>สวัสดีคุณ <b>สมชาย ใจดี</b> ระบบได้ผูกข้อมูลการจองจากตัวแทนจำหน่าย (OTA) เรียบร้อยแล้ว</p>
+                        <div class="bg-slate-50 p-2 rounded-lg border border-slate-100 text-[11px] mt-1">
+                            <div>เที่ยวบิน: <b>OD 521 (DMK - KUL)</b></div>
+                            <div>รหัสการจอง (PNR): <b class="text-red-600">BTK89X</b></div>
+                        </div>
+                        <p class="text-[11px] text-slate-500 pt-1">หากเที่ยวบินมีการเปลี่ยนแปลง ระบบจะแจ้งเตือนคุณทันทีผ่านช่องทางนี้</p>
+                    </div>
+                </div>`;
+            addLog('SYSTEM RESET: All flight statuses restored to ON TIME.');
+        }
+    </script>
+</body>
+</html>
